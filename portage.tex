@@ -1,13 +1,157 @@
-\documentclass[9pt,a4paper,technote]{IEEEtran}
-\title{Portage: Bring Hackers' Wisdom to Science}
-\author{\IEEEauthorblockN{Guilherme Amadio}, \\
-  \IEEEauthorblockN{Benda Xu}\\
-  \IEEEauthorblockA{Kavli IPMU, UTIAS, The University of Tokyo, Japan}}
+\documentclass[a4paper,conference]{IEEEtran}
+
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+
+\hypersetup{
+  pdfauthor = {Guilherme Amadio and Benda Xu},
+  colorlinks, urlcolor=black, citecolor=black,
+  pdftitle = {Portage: Bringing Hackers' Wisdom to Science},
+  pdfsubject = {Third International Workshop on HPC User Support Tools}
+}
+
+\title{Portage: Bringing Hackers' Wisdom to Science}
+
+\author{
+  \IEEEauthorblockN{Guilherme Amadio}
+  \IEEEauthorblockA{São Paulo State University, Brazil\\
+                    Gentoo Linux\\amadio@gentoo.org}
+  \and
+  \IEEEauthorblockN{Benda Xu}
+  \IEEEauthorblockA{The University of Tokyo, Japan\\
+                    Gentoo Linux\\heroxbd@gentoo.org}
+}
 
 \begin{document}
 \maketitle
+
 \begin{abstract}
-  Portage is awesome.
+
+Providing users of HPC systems a wide variety of up to date software
+packages is a challenging task. Large software stacks built from source
+have difficult to manage dependencies, requiring powerful package
+management tools. The Portage package manager from Gentoo is a highly
+flexible tool that offers a mature solution to this otherwise daunting
+task. The Gentoo Prefix project develops and maintains a way of
+installing Gentoo systems in non-standard locations, bringing the
+virtues of Gentoo to other operating systems. Here we shall demonstrate
+how Gentoo Prefix installations can be used to cross compile software
+packages for the Intel® Xeon Phi™, as well as to manage large software
+stacks in HPC environments.
+
 \end{abstract}
-Yes, Portage is awesome.
+
+\section{Introduction}
+
+Building and maintaining a large software stack on an HPC environment
+requires powerful packaging tools. Packages provided by the core operating
+systems from HPC vendors often lag significantly behind the latest
+upstream releases, while users want to make use of new features in
+recent software releases, or build against specific versions of software
+packages for compatibility or consistency reasons. In order to satisfy
+users, the package manager must take into account the multitude of
+configuration options for each package as well as ensure that the build
+order is correct. It must also be able to distinguish between build
+time, run time, and post build dependencies, and be able to force
+package rebuilds when configuration options of dependencies change,
+without rebuilding the full tree of packages. Finally, due to the
+particularities of each HPC environment, it is highly desirable for the
+package manager to offer the ability to easily apply patches to specific
+software packages. Fortunately, Gentoo's \cite{gentoo} Portage
+\cite{gentoo:portage} package manager is able to do all this and much
+more. On HPC systems where users usually do not have permission to
+install software into standard locations, Gentoo Prefix
+\cite{gentoo:prefix} allows installations of a Gentoo environment into
+non-standard paths.
+
+\subsection{Gentoo Linux}
+
+Gentoo Linux \cite{gentoo} is a source-based distribution with powerful
+tools that make it an excellent development environment. Gentoo has been
+first released by its founder Daniel Robbins in December of 1999, and
+has been in active development since then. It is a metadistribution, in
+the sense that it provides the necessary tools for the user to build
+his[her] own customized version of Gentoo. Gentoo uses its own package
+manager, Portage \cite{gentoo:portage}, written in Python and inspired
+by the ports system from FreeBSD. Gentoo is not based on any Linux
+distribution, but is itself the root of popular distributions such as
+Arch Linux, Sabayon Linux, and innovative operating systems such as
+CoreOS \cite{coreos} and Google's ChromeOS \cite{chromiumos}.
+
+\subsection{Gentoo Prefix Project}
+
+The Gentoo Prefix project \cite{gentoo:prefix} brings the virtues of
+Gentoo Linux---such as high configurability, performance tuning, and
+automated package dependency management---to different operating
+systems. This is useful for installing software into systems where the
+user might not have administrator privileges, or simply to use Gentoo's
+Portage package manager to automate the process of fetching source code,
+building, and installing software packages available in Gentoo and
+having their dependencies automatically handled, including the
+configuration options of each package.
+
+Gentoo Prefix uses the host system's kernel and standard C library, but
+all other tools are installed and managed during the bootstrapping of
+the system. There is also a more experimental version of Gentoo Prefix
+that compiles its own standard C library. Installation of the Gentoo
+Prefix environment is performed by a shell script that installs the
+Portage package manager into a temporary location, then uses it to
+bootstrap a compiler and install the base system, which allows the user
+to compile and install other sofware packages available in the Portage
+database. Gentoo Prefix can be installed not only on Linux, but also on
+Mac OS X, BSD, AIX, Solaris, etc. Gentoo Prefix is similar to what
+projects such as Homebrew and MacPorts provide for Macs, but builds
+its packages from source, rather than offering binary packages.
+
+\subsection{Portage Package Manager}
+
+Portage is a GPLv2 package management system based on FreeBSD's ports
+collection. Portage consists of two main parts, the \emph{ebuild}
+system, and the \emph{emerge} command line utility. The ebuild system is
+responsible for executing build instructions and installing packages,
+while emerge provides dependency management, and servers as the
+interface to ebuild. The relationship between ebuild and emerge is not
+unlike that of rpm and yum on Red Hat, and that of dpkg and apt on
+Debian.
+
+Portage packages are special bash shell scripts called \emph{ebuilds}
+(not to be confused with the ebuild tool itself that is used to run
+them). Ebuilds are similar to spec files in SRPMs; they contain
+information on how to download, configure, compile, and install
+software, as well as their dependency requirements. Gentoo's main ebuild
+repository has more than 27000 ebuilds available for a variety of
+architectures. Additional packages are available via official and
+unofficial package overlays that complement the main tree of packages.
+The special syntax used in ebuild scripts is standardized in the Package
+Manager Specification (PMS) \cite{gentoo:pms} document. The PMS
+documents the behavior of Portage so that Gentoo packages can be managed
+by alternative package managers.
+
+The Portage system has the concept of \emph{USE flags} to allow the user
+to configure compile-time options of software packages. USE flags affect
+which dependencies are required to build a package, which allows, for
+example, a headless server to be installed with a lighter system image,
+by stripping all options for building a graphical environment. USE flags
+can be used in HPC systems to enable or disable MPI support, to choose
+which version of the Python interpreter a module should target, to
+enable specific instruction sets for a given architecture, among many
+others.
+
+For software packages that require specific versions, Portage has the
+concept of package \emph{SLOTs}, which allow multiple versions of a same
+package to be installed simultaneously on the same system. This is very
+useful for, e.g., installing packages that depend on incompatible
+versions of the same library, or to have multiple compiler versions
+available for development and testing. SLOTs can also be used in package
+dependencies to indicate when a package should be rebuilt should the
+installed version of its dependencies change.
+
+% TODO: keywords, stable/unstable/masked, patching, profiles.
+
+\section{Cross Compiling Software for the Xeon Phi™}
+
+\section{Gentoo Prefix on an HPC environment}
+
+\bibliographystyle{IEEEtran}
+\bibliography{portage}
 \end{document}
