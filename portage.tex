@@ -29,7 +29,7 @@
 
 Providing users of HPC systems a wide variety of up to date software
 packages is a challenging task. Large software stacks built from source
-have difficult to manage dependencies, requiring powerful package
+are difficult to manage dependencies, requiring powerful package
 management tools. The Portage package manager from Gentoo is a highly
 flexible tool that offers a mature solution to this otherwise daunting
 task. The Gentoo Prefix project develops and maintains a way of
@@ -74,8 +74,8 @@ the sense that it provides the necessary tools for the user to build
 his[her] own customized version of Gentoo. Gentoo uses its own package
 manager, Portage \cite{gentoo:portage}, written in Python and inspired
 by the ports system from FreeBSD. Gentoo is not based on any Linux
-distribution, but is itself the root of popular distributions such as
-Arch Linux, Sabayon Linux, and innovative operating systems such as
+distribution, but is itself the root of popular distributions like
+Sabayon Linux, and innovative operating systems such as
 CoreOS \cite{coreos} and Google's ChromeOS \cite{chromiumos}.
 
 \subsection{Gentoo Prefix Project}
@@ -92,16 +92,15 @@ configuration options of each package.
 
 Gentoo Prefix uses the host system's kernel and standard C library, but
 all other tools are installed and managed during the bootstrapping of
-the system. There is also a more experimental version of Gentoo Prefix
-that compiles its own standard C library. Installation of the Gentoo
+the system. On Linux, Gentoo Prefix can also compile its own standard C library.
+Installation of the Gentoo
 Prefix environment is performed by a shell script that installs the
 Portage package manager into a temporary location, then uses it to
 bootstrap a compiler and install the base system, which allows the user
 to compile and install other sofware packages available in the Portage
 database. Gentoo Prefix can be installed not only on Linux, but also on
-Mac OS X, BSD, AIX, Solaris, etc. Gentoo Prefix is similar to what
-projects such as Homebrew and MacPorts provide for Macs, but builds
-its packages from source, rather than offering binary packages.
+Mac OS X, BSD, AIX, Solaris, etc.  On Mac OS X, Gentoo Prefix is similar to those
+projects such as Homebrew, MacPorts (source based) and Fink (binary based).
 
 \subsection{Portage Package Manager}
 
@@ -125,7 +124,7 @@ unofficial package overlays that complement the main tree of packages.
 The special syntax used in ebuild scripts is standardized in the Package
 Manager Specification (PMS) \cite{gentoo:pms} document. The PMS
 documents the behavior of Portage so that Gentoo packages can be managed
-by alternative package managers.
+by alternative package managers, such as paludis \cite{paludis} and pkgcore \cite{pkgcore}.
 
 The Portage system has the concept of \emph{USE flags} to allow the user
 to configure compile-time options of software packages. USE flags affect
@@ -138,7 +137,7 @@ enable specific instruction sets for a given architecture, among many
 others.
 
 For software packages that require specific versions, Portage has the
-concept of package \emph{SLOTs}, which allow multiple versions of a same
+concept of package \emph{SLOTs} \cite[p.~27]{gentoo:pms}, which allow multiple versions of a same
 package to be installed simultaneously on the same system. This is very
 useful for, e.g., installing packages that depend on incompatible
 versions of the same library, or to have multiple compiler versions
