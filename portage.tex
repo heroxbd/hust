@@ -58,8 +58,8 @@ package rebuilds when configuration options of dependencies change,
 without rebuilding the full tree of packages. Finally, due to the
 particularities of each HPC environment, it is highly desirable for the
 package manager to offer the ability to easily apply patches to specific
-software packages. Fortunately, Gentoo's \cite{gentoo} Portage
-\cite{gentoo:portage} package manager is able to do all this and much
+software packages. Fortunately, Gentoo's~\cite{gentoo} Portage~\cite{gentoo:portage}
+package manager is able to do all this and much
 more. On HPC systems where users usually do not have permission to
 install software into standard locations, Gentoo Prefix
 \cite{gentoo:prefix} allows installations of a Gentoo environment into
@@ -73,7 +73,7 @@ first released by its founder Daniel Robbins in December of 1999, and
 has been in active development since then. It is a metadistribution, in
 the sense that it provides the necessary tools for the user to build
 his[her] own customized version of Gentoo. Gentoo uses its own package
-manager, Portage \cite{gentoo:portage}, written in Python and inspired
+manager, Portage~\cite{gentoo:portage}, written in Python and inspired
 by the ports system from FreeBSD. Gentoo is not based on any Linux
 distribution, but is itself the root of popular distributions like
 Sabayon Linux, and innovative operating systems such as
@@ -165,8 +165,11 @@ and workload of HPC software maintenance. \LaTeX{} and pandoc for
 publication, emacs and vim for editing, vnc and xpra for remote
 display, to name a few, are all available.
 
-The following sections presents several case studies to show the
-flexibility of Gentoo Prefix.
+From users' point of view, Gentoo Prefix vastly expands the tools
+available for HPC.  From administrators' point of view, Gentoo Prefix
+supports a diversity of user needs and at the same time keep the core
+operating system stable and secure. The following sections presents
+several case studies to show the flexibility of Gentoo Prefix.
 
 \subsection{Nested Job-Scheduling with Slurm}
 \label{sec:slurm}
@@ -248,6 +251,60 @@ with slurm tools.
 
 \subsection{Memory Profile with Valgrind and massif-visualizer}
 \label{sec:massif}
+In the context of HPC, my large scale problems could become
+memory-bounded, for example when fill-in happens to a sparse matrix
+based algorithm.  Valgrind is traditionally a memory debugging tool
+for memory leak detection.  A heap profiler, massif~\cite{massif}, is
+also distributed with valgrind.
+massif-visualizer~\cite{massif:visualizer} is a handful GUI visualizer
+for interpreting massif outputs besides the default CLI-based
+\texttt{ms-print}.
+
+massif-visualizer is a KDE application.  It depends on a recent KDE
+framework, which is a fairly large and complex software stack.  Gentoo
+Prefix readily provides the whole KDE stack thanks to the shared
+\textit{ebuilds} with main Gentoo repository.  As massif-visualizer is
+already in the KDE overlay, building it is straightforward,
+\begin{verbatim}
+$ layman --add=kde
+$ emerge kde-misc/massif-visualizer
+\end{verbatim}
+and of course in addition to valgrind
+\begin{verbatim}
+$ emerge dev-util/valgrind
+\end{verbatim}
+
+To resolve the function names in the stack in valgrind output, debug
+symbols are needed.  A neat feature is provided by portage to control
+build environment in a per package-basis.  For example to get memory
+profile of a quantile regression package \texttt{quantreg} of GNU R,
+debug symbols of glibc, R and quantreg are needed. In
+\texttt{EPREFIX/etc/portage/env/debug-cflags.conf},
+\begin{verbatim}
+CFLAGS="-O2 -ggdb -pipe"
+CXXFLAGS="${CFLAGS}"
+FEATURES="${FEATURES} splitdebug"
+\end{verbatim}
+and in \texttt{EPREFIX/etc/portage/package.env},
+\begin{verbatim}
+sci-CRAN/quantreg debug-cflags.conf
+dev-lang/R debug-cflags.conf
+sys-libs/glibc debug-cflags.conf
+\end{verbatim}
+and rebuild the packages,
+\begin{verbatim}
+$ emerge sys-libs/glibc dev-lang/R \
+> sci-CRAN/quantreg
+\end{verbatim}
+
+To produce and view the memory profile,
+\begin{verbatim}
+R -d "valgrind --tool=massif \
+> --massif-out-file=rq.prof" -f rq.R
+$ massif-visualizer rq.prof
+\end{verbatim}
+where \texttt{rq.R} is the R script to be profiled, its content
+irrelavent to the discussion here.
 
 \section{Comparison to Alternative Package Managers}
 
