@@ -1,6 +1,7 @@
 \documentclass[a4paper,conference]{IEEEtran}
 
 \usepackage[utf8]{inputenc}
+\usepackage{graphicx}
 \usepackage{hyperref}
 
 \hypersetup{
@@ -92,7 +93,7 @@ configuration options of each package.
 
 Gentoo Prefix uses the host system's kernel and standard C library, but
 all other tools are installed and managed during the bootstrapping of
-the system. On Linux, Gentoo Prefix can also compile its own standard C library.
+the system. On Linux, Gentoo Prefix can also compile its own standard C library~\cite{gentoo:rap}.
 Installation of the Gentoo
 Prefix environment is performed by a shell script that installs the
 Portage package manager into a temporary location, then uses it to
@@ -103,6 +104,7 @@ Mac OS X, BSD, AIX, Solaris, etc.  On Mac OS X, Gentoo Prefix is similar to thos
 projects such as Homebrew, MacPorts (source based) and Fink (binary based).
 
 \subsection{Portage Package Manager}
+\label{sec:ebuild}
 
 Portage is a GPLv2 package management system based on FreeBSD's ports
 collection. Portage consists of two main parts, the \emph{ebuild}
@@ -150,6 +152,104 @@ installed version of its dependencies change.
 \section{Cross Compiling Software for the Xeon Phi™}
 
 \section{Gentoo Prefix on an HPC environment}
+As Gentoo Prefix runs on all the GNU/Linux Distributions, it supports
+GNU/Linux-based HPC systems off-the-shelf.  It is also reported that
+Gentoo Prefix runs on Cray with some minor site-specific modifications
+\cite{cray}.
+
+Gentoo Prefix uses ebuilds from Gentoo main repository~(Section
+\ref{sec:ebuild}) and receives cutting edge updates by 300 developers
+and contributed by thousands of users.  It is a general-purpose and
+full-featured environment, which mitigates a big portion of complexity
+and workload of HPC software maintenance. \LaTeX{} and pandoc for
+publication, emacs and vim for editing, vnc and xpra for remote
+display, to name a few, are all available.
+
+The following sections presents several case studies to show the
+flexibility of Gentoo Prefix.
+
+\subsection{Nested Job-Scheduling with Slurm}
+\label{sec:slurm}
+Although HPC programs are typically parallel, for some embarrassingly
+parallel tasks like data analysis and simulation, it is enough to have
+a grid infrastructure running many single-threaded workers divided by
+input data.
+
+Some supercomputing site allocates resources in units of nodes and
+leaves finer scheduling within nodes to users.  For MPI-based parallel
+programs it is straight-forward, but for single-threaded programs it
+is tricky to efficiently and reliably use all the CPUs in an allocated
+node.
+
+Instead of writing \textit{ad hoc} shell scripts to launch multiple
+single-threaded programs, slurm or torque available in Gentoo could be
+used as a nested scheduler and allocate jobs in units of
+CPUs.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{../node-slurm.eps}
+  \caption{User slurm is nested in site PBS Pro.  The nodes are
+    allocated by PBS and 1 slurm worker runs on 1 node.
+    Single-threaded jobs are controlled and queued by user slurm
+    controller.  Resources within a node are individually allocated.}
+  \label{fig:slurm}
+\end{figure}
+
+Assume the host scheduler to be PBS Professional installed by site
+administrator, the nested scheduler to be slurm installed by a normal
+user with Gentoo Prefix, and the filesystem is shared between all
+nodes.~(Fig.~\ref{fig:slurm}) slurm is installed by
+\begin{verbatim}
+$ emerge sys-cluster/slurm
+\end{verbatim}
+where \texttt{\$} is the normal user command line prompt.  After editing
+\texttt{EPREFIX/etc/slurm/slurm.conf} to enable individual
+allocation of resources within a node, slurm worker
+can be launched by \texttt{slurmd} and slurm controller by
+\texttt{slurmctld}.  \texttt{EPREFIX} is the installation offset of
+Gentoo Prefix.
+
+It is recommended to use munge for authentication between
+\texttt{slurmd} and \texttt{slurmctld}.  OpenRC, a dependency aware
+service manager, is suitable to manage the relation between munge and
+slurm daemons.  Make named runlevels slurm worker and controller,
+\begin{verbatim}
+$ mkdir EPREFIX/etc/runlevels/worker
+$ mkdir EPREFIX/etc/runlevels/controller
+\end{verbatim}
+Add services to the corresponding runlevels,
+\begin{verbatim}
+$ rc-update add munged controller worker
+$ rc-update add slurmctld controller
+$ rc-update add slurmd controller
+\end{verbatim}
+On the controller node (or login node), start slurmctld by
+\begin{verbatim}
+$ openrc controller
+ * Starting munged ...
+ * Starting slurm control daemon ...
+\end{verbatim}
+Submit a PBS batch script to launch slurm workers,
+\begin{verbatim}
+$ cat slurmd.sh
+#!/bin/sh
+#PBS -l select=32:ncpus=36:mpiprocs=1
+#PBS -l walltime=48:00:00
+source EPREFIX/etc/profile
+mpirun sh -c "openrc worker; sleep 2d"
+$ qsub slurmd.sh
+\end{verbatim}
+In the script, 32 nodes, each having 36 CPUs, are requested for 2
+days. \texttt{mpirun} is used to launch 1 slurm worker per node.
+
+After the workers are started, single-threaded jobs can be submitted
+with slurm tools.
+
+\subsection{Memory Profile with Valgrind and massif-visualizer}
+\label{sec:massif}
+
+\section{Comparison to Alternative Package Managers}
 
 \bibliographystyle{IEEEtran}
 \bibliography{portage}
