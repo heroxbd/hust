@@ -80,6 +80,7 @@ Sabayon Linux, and innovative operating systems such as
 CoreOS \cite{coreos} and Google's ChromeOS \cite{chromiumos}.
 
 \subsection{Gentoo Prefix Project}
+\label{sec:portage}
 
 The Gentoo Prefix project \cite{gentoo:prefix} brings the virtues of
 Gentoo Linux---such as high configurability, performance tuning, and
@@ -306,7 +307,35 @@ $ massif-visualizer rq.prof
 where \texttt{rq.R} is the R script to be profiled, its content
 irrelavent to the discussion here.
 
-\section{Comparison to Alternative Package Managers}
+\section{Comparison to the Alternatives}
+The discussion is based on a software packaging technical report of
+HEP software fundation~\cite{hsf:package}.
+
+Gentoo runs on Linux, Mac OS X and Windows
+(Section \label{sec:portage}).
+
+Support for building and installing multiple stacks in parallel:
+yes, through SLOTs.
+
+Support for multiple variants of the same project: Multi-Rel: yes,
+by Prefix-chaining.
+
+Support setting up runtime environment for a given stack, support
+multiple shell flavors: yes, by Prefix-chaining, or eselect, or
+modules.
+
+Relocation, no.
+
+Performance, all yes.
+
+Sys-reuse, yes, with ebuild wrappers (e.g. cctools).
+
+Community, very active.
+
+Unique-IDs, yes.
+
+Integrated support for check-out of given tags or branches from the
+projects repositories directly: yes.
 
 \bibliographystyle{IEEEtran}
 \bibliography{portage}
