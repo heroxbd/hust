@@ -152,6 +152,32 @@ installed version of its dependencies change.
 
 \section{Cross Compiling Software for the Xeon Phi™}
 
+Portage can be configured to cross compile software for different
+platforms. The usual way of doing so is to follow the Gentoo Embedded
+Handbook \cite{gentoo:embedded} to set up the appropriate toolchain and
+Portage profile. However, cross compiling for the Xeon Phi™ is somewhat
+different, as only the Intel® C/C++ Compiler has full support for the
+Xeon Phi™'s IMCI (Initial ManyCore Instructions) architecture, which is
+quite similar to the x86 architecture, but has some subtle differences.
+Since the Xeon Phi™ is used as a coprocessor, booting does not follow a
+conventional procedure either, but once it is up, it mostly works as a
+regular computer; users can just ssh into it and run their programs. In
+our setup, a server with CentOS 7 and Intel tools installed was used to
+host the Gentoo Prefix installation.
+
+Installation instructions for Gentoo Prefix can be found on the project
+website \cite{gentoo:prefix}. The process is mostly automated by a shell
+script, \texttt{bootstrap-prefix.sh}, which installs a temporary version
+of Portage, and uses the host's toolchain to bootstrap Portage's toolchain
+At the end, the \texttt{emerge} command line utility can be used to
+install extra software packages.
+
+We chose Geant4 as a real world example of an application to be cross
+compiled and run on the Xeon Phi. Geant4 is a toolkit for the simulation
+of the passage of particles through matter. It is used at the LHC to
+simulate particle collisions, and played a key role in the discovery of
+the Higgs boson, announced in 2012.
+
 \section{Gentoo Prefix on an HPC environment}
 As Gentoo Prefix runs on all the GNU/Linux Distributions, it supports
 GNU/Linux-based HPC systems off-the-shelf.  It is also reported that
