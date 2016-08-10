@@ -30,15 +30,15 @@
 
 Providing users of HPC systems a wide variety of up to date software
 packages is a challenging task. Large software stacks built from source
-are difficult to manage dependencies, requiring powerful package
-management tools. The Portage package manager from Gentoo is a highly
-flexible tool that offers a mature solution to this otherwise daunting
-task. The Gentoo Prefix project develops and maintains a way of
-installing Gentoo systems in non-standard locations, bringing the
-virtues of Gentoo to other operating systems. Here we shall demonstrate
-how Gentoo Prefix installations can be used to cross compile software
-packages for the Intel® Xeon Phi™, as well as to manage large software
-stacks in HPC environments.
+are difficult to manage, requiring powerful package management tools.
+The Portage package manager from Gentoo is a highly flexible tool that
+offers a mature solution to this otherwise daunting task. The Gentoo
+Prefix project develops and maintains a way of installing Gentoo systems
+in non-standard locations, bringing the virtues of Gentoo to other
+operating systems. Here we shall demonstrate how Gentoo Prefix
+installations can be used to cross compile software packages for the
+Intel® Xeon Phi™, as well as to manage large software stacks in HPC
+environments.
 
 \end{abstract}
 
@@ -55,15 +55,15 @@ configuration options for each package as well as ensure that the build
 order is correct. It must also be able to distinguish between build
 time, run time, and post build dependencies, and be able to force
 package rebuilds when configuration options of dependencies change,
-without rebuilding the full tree of packages. Finally, due to the
-particularities of each HPC environment, it is highly desirable for the
-package manager to offer the ability to easily apply patches to specific
-software packages. Fortunately, Gentoo's~\cite{gentoo} Portage~\cite{gentoo:portage}
-package manager is able to do all this and much
-more. On HPC systems where users usually do not have permission to
-install software into standard locations, Gentoo Prefix
-\cite{gentoo:prefix} allows installations of a Gentoo environment into
-non-standard paths.
+without rebuilding the full tree of packages in the process. Finally,
+due to the particularities of each HPC environment, it is highly
+desirable for the package manager to offer the ability to easily apply
+patches to specific software packages. Fortunately,
+Gentoo's~\cite{gentoo} Portage~\cite{gentoo:portage} package manager is
+able to do all this and much more. On HPC systems where users usually do
+not have permission to install software into standard locations, Gentoo
+Prefix \cite{gentoo:prefix} allows installations of a Gentoo environment
+into non-standard paths.
 
 \subsection{Gentoo Linux}
 
@@ -94,15 +94,15 @@ configuration options of each package.
 
 Gentoo Prefix uses the host system's kernel and standard C library, but
 all other tools are installed and managed during the bootstrapping of
-the system. On Linux, Gentoo Prefix can also compile its own standard C library~\cite{gentoo:rap}.
-Installation of the Gentoo
-Prefix environment is performed by a shell script that installs the
-Portage package manager into a temporary location, then uses it to
-bootstrap a compiler and install the base system, which allows the user
-to compile and install other sofware packages available in the Portage
-database. Gentoo Prefix can be installed not only on Linux, but also on
-Mac OS X, BSD, AIX, Solaris, etc.  On Mac OS X, Gentoo Prefix is similar to those
-projects such as Homebrew, MacPorts (source based) and Fink (binary based).
+the system. On Linux, Gentoo Prefix can also compile its own standard C
+library~\cite{gentoo:rap}. Installation of the Gentoo Prefix environment
+is performed by a shell script that installs the Portage package manager
+into a temporary location, then uses it to bootstrap a compiler and
+install the base system, which allows the user to compile and install
+other sofware packages available in the Portage database. Gentoo Prefix
+can be installed not only on Linux, but also on Mac OS X, BSD, AIX,
+Solaris, etc. On Mac OS X, Gentoo Prefix is similar to those projects
+such as Homebrew, MacPorts (source based) and Fink (binary based).
 
 \subsection{Portage Package Manager}
 \label{sec:ebuild}
@@ -149,34 +149,6 @@ dependencies to indicate when a package should be rebuilt should the
 installed version of its dependencies change.
 
 % TODO: keywords, stable/unstable/masked, patching, profiles.
-
-\section{Cross Compiling Software for the Xeon Phi™}
-
-Portage can be configured to cross compile software for different
-platforms. The usual way of doing so is to follow the Gentoo Embedded
-Handbook \cite{gentoo:embedded} to set up the appropriate toolchain and
-Portage profile. However, cross compiling for the Xeon Phi™ is somewhat
-different, as only the Intel® C/C++ Compiler has full support for the
-Xeon Phi™'s IMCI (Initial ManyCore Instructions) architecture, which is
-quite similar to the x86 architecture, but has some subtle differences.
-Since the Xeon Phi™ is used as a coprocessor, booting does not follow a
-conventional procedure either, but once it is up, it mostly works as a
-regular computer; users can just ssh into it and run their programs. In
-our setup, a server with CentOS 7 and Intel tools installed was used to
-host the Gentoo Prefix installation.
-
-Installation instructions for Gentoo Prefix can be found on the project
-website \cite{gentoo:prefix}. The process is mostly automated by a shell
-script, \texttt{bootstrap-prefix.sh}, which installs a temporary version
-of Portage, and uses the host's toolchain to bootstrap Portage's toolchain
-At the end, the \texttt{emerge} command line utility can be used to
-install extra software packages.
-
-We chose Geant4 as a real world example of an application to be cross
-compiled and run on the Xeon Phi. Geant4 is a toolkit for the simulation
-of the passage of particles through matter. It is used at the LHC to
-simulate particle collisions, and played a key role in the discovery of
-the Higgs boson, announced in 2012.
 
 \section{Gentoo Prefix on an HPC environment}
 As Gentoo Prefix runs on all the GNU/Linux Distributions, it supports
@@ -332,6 +304,108 @@ $ massif-visualizer rq.prof
 \end{verbatim}
 where \texttt{rq.R} is the R script to be profiled, its content
 irrelavent to the discussion here.
+
+\subsection{Cross Compiling Software for the Xeon Phi™}
+
+Portage can be configured to cross compile software for different
+platforms. The usual way of doing so is to follow the Gentoo Embedded
+Handbook \cite{gentoo:embedded} to set up the appropriate toolchain and
+Portage profile. However, cross compiling for the Xeon Phi™ is somewhat
+different, as only the Intel® C/C++ Compiler has full support for the
+Xeon Phi™'s IMCI (Initial ManyCore Instructions) architecture, which is
+quite similar to the x86 architecture, but has some subtle differences.
+The fact that the Xeon Phi™ is used as a coprocessor and booting does
+not follow a conventional procedure is irrelevant for cross compiling.
+Once the Xeon Phi™ is properly set up, it basically works as a headless
+server; users can just ssh into it and run their programs. In our setup,
+a server with CentOS 7 and Intel tools installed was used to host the
+Gentoo Prefix installation.
+
+Installation instructions for Gentoo Prefix can be found on the project
+website \cite{gentoo:prefix}. The \texttt{bootstrap-prefix.sh} script
+automates most of the process.
+\begin{verbatim}
+(download script from project website)
+$ chmod 755 bootstrap-prefix.sh
+$ ./bootstrap-prefix.sh
+(follow the instructions)
+\end{verbatim}
+
+The bootstrap process consists roughly of three stages: installing a
+temporary version of portage, boostrapping a compiler using the host's
+toolchain, then bootstrapping a full system with the bootstrapped
+compiler. On Linux, a C library can also be part of the bootstrap
+process, in which case the kernel is the only piece shared between the
+host and the prefix environment.
+
+The script works as an interactive installer; it will ask the user for
+some information and discuss options based on the system being
+bootstrapped on. Once the script finishes running, it will create a
+\texttt{startprefix} script at the root of the bootstrapped system.
+Running that script brings the user into the prefix environment, and
+\texttt{emerge} and other tools become available to let the user install
+more packages.
+\begin{verbatim}
+$ ${EPREFIX}/startprefix
+Entering Gentoo Prefix /micfs/gentoo
+$
+\end{verbatim}
+In order to install Intel C/C++ compiler it is necessary to first place
+the license file in \verb|${EPREFIX}/opt/intel/licenses|, and add
+\verb|Intel-SDP| to \verb|ACCEPT_LICENSE| in portage's main config file
+\verb|${EPREFIX}/etc/portage/make.conf|. Then, installing is done with
+\begin{verbatim}
+$ emerge dev-lang/icc
+\end{verbatim}
+
+Next, it is necessary to configure the new directory where cross
+compiled software will be installed. In our system, we used a separate
+partition \verb|/micfs| to hold the Gentoo Prefix \verb|/micfs/gentoo|
+and the cross compiled prefix \verb|/micfs/gentoo-mic|. The directory
+\verb|/micfs/gentoo-mic/etc/portage| contains files to configure Portage
+to use the Intel compiler, and the proper compilation flags to cross
+compile for the Xeon Phi.
+
+% include listings of PREFIX/etc/portage/{bashrc,make.conf,profile/*}
+\begin{verbatim}
+$ cd /micfs/gentoo-mic/etc/portage
+$ cat > bashrc <<-EOF
+source /path/to/icc/compilervars.sh intel64
+EOF
+$ cat > make.conf <<-EOF
+CC=icc
+CXX=icpc
+MPI_C=mpiicc
+MPI_CXX=mpiicpc
+LD=xild
+AR=xiar
+
+CFLAGS="-mmic"
+CXXFLAGS="${CFLAGS}"
+EOF
+\end{verbatim}
+
+We chose Geant4 as a real world example of an application to be cross
+compiled and run on the Xeon Phi. Geant4 is a toolkit for the
+simulation of the passage of particles through matter. It is used at the
+LHC to simulate particle collisions, and played a key role in the
+discovery of the Higgs boson, announced in 2012. With everything setup,
+cross compilation is done by running
+\begin{verbatim}
+$ emerge \
+> --root=/micfs/gentoo \
+> --config-root=/micfs/gentoo \
+> --prefix=/ sci-physics/geant
+\end{verbatim}
+
+To confirm that the software was properly cross compiled, we can check
+the architecture of the generated libraries with \verb|readelf|:
+\begin{verbatim}
+$ readelf -h \
+> /micfs/gentoo-mic/usr/lib/libG4global.so |
+> grep Machine
+  Machine:              Intel K1OM
+\end{verbatim}
 
 \section{Comparison to the Alternatives}
 The discussion is based on a software packaging technical report of
