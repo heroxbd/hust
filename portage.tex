@@ -407,35 +407,65 @@ $ readelf -h \
   Machine:              Intel K1OM
 \end{verbatim}
 
-\section{Comparison to the Alternatives}
-The discussion is based on a software packaging technical report of
-HEP software fundation~\cite{hsf:package}.
+\section{Assessment of Portage for HPC}
+With more than 10 years development, portage has become an excellent
+mature package management system.  It is general purpose and used in a
+diversity of scenarios.  It worths to assess whether portage meets the
+specific needs of HPC community.  The technical report from software
+packaging working group of HEP software fundation~\cite{hsf:package}
+has suumerized the requirements of HPC from from high energy physics
+point of view, which is applicable to other fields.
 
-Gentoo runs on Linux, Mac OS X and Windows
-(Section \label{sec:portage}).
+As the core of Gentoo a meta distribution, portage naturally satisfies
+all the requirements:
 
-Support for building and installing multiple stacks in parallel:
-yes, through SLOTs.
+\begin{enumerate}
+\item portability: Portage runs on GNU/Linux, Android/Linux, Solaris,
+  AIX, Mac OS X, Windows and more (Section \ref{sec:portage}).
+\item multiple versions: Portage support for building and installing
+  multiple stacks in parallel with the SLOT mechanism
+  (Section \label{sec:ebuild}).
+\item ease: Portage is self-contained, easy to add new packages by
+  ebuild (Section \ref{sec:portage}), and easy to bootstrap on POSIX
+  environments. 
+\item support: The Gentoo community is friendly, active and
+  supportive.  Documentaion of Gentoo is abundant and informative.
+\item performance: Gentoo is a Linux distribution famous for keeping
+  users' CPU warm.  Compiling thousands of packages is a daily
+  exercise of an average Gentoo user.  Portage provides a mature build
+  system scrutinized by hackers all around the world and tested in
+  every extreme setups. The vcs support (checking out sources from
+  cvs, svn, git, mercury, etc. is implemented by eclasses.
+\end{enumerate}
 
-Support for multiple variants of the same project: Multi-Rel: yes,
-by Prefix-chaining.
+\section{A Deeper Look at Multiple Versions and Build Configurations}
+Both the HSF technical report~\cite{hsf:package} and Gamblin et
+al.~\cite{spack} argue that multiple versions and multiple build
+options of the same package should be available at the same time to
+support wide user groups in a shared HPC environment.
 
-Support setting up runtime environment for a given stack, support
-multiple shell flavors: yes, by Prefix-chaining, or eselect, or
-modules.
+Gamblin et al.~\cite{spack} argue that software build is by its nature
+combinatorial, therefore a package manager should support all the
+combinations natively.  Although from an administrator point of view
+the system should potentially all kind of combinations, for a single
+user or a closely collaborated group this is an overkill.
 
-Relocation, no.
+If each group maintain their own packages, then support for multiple
+versions or build configurations is rarely necessary.  If the site
+administrator installs multiple versions or build configurations for
+different groups, the overhead of request-response still exists.
 
-Performance, all yes.
+Only few packages need it, the majority do not.  Conscious and
+educated decisions are need for each package to enable multiple
+version/build-configuration.  For packages that are decided to have
+multiple, portage provides the frameworks: including multilib,
+eselect, slot.
 
-Sys-reuse, yes, with ebuild wrappers (e.g. cctools).
+Gentoo Prefix is easy to bootstrap, and even easier to bootstrap a new
+one from an existing installation. Throught Prefix-chaining,
+initiating a new installation is even cheaper.
 
-Community, very active.
-
-Unique-IDs, yes.
-
-Integrated support for check-out of given tags or branches from the
-projects repositories directly: yes.
+\section{Multiple Build Variants}
 
 \bibliographystyle{IEEEtran}
 \bibliography{portage}
