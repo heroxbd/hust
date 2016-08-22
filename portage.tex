@@ -420,16 +420,16 @@ EOF
 \end{verbatim}
 }
 
-To cross compile Python 2.7, a patch \cite{libffi-k1om} needs to be
-applied to one of its dependencies, libffi, in order for it to properly
-cross compile for the Xeon Phi™. Portage supports user patches to be
-applied by simply dropping them into \verb|EPREFIX/etc/portage/patches|
-in a subdirectory corresponding to the package to be patched, with an
-optional version. In this case, we dropped the patch file
-\verb|libffi-3.2.1-k1om.patch| into the subdirectory
-\verb|dev-libs/libffi-3.2.1| under
-\verb|/micfs/gentoo-mic/etc/portage/patches|.
-If the version is ommitted, the patch will apply to all versions.
+To cross compile Python 2.7 \cite{python-k1om-youtube}, a patch
+\cite{libffi-k1om} needs to be applied to one of its dependencies,
+libffi, in order for it to properly cross compile for the Xeon Phi™.
+Portage supports user patches to be applied by simply dropping them into
+\verb|EPREFIX/etc/portage/patches| in a subdirectory corresponding to
+the package to be patched, with an optional version. In this case, we
+dropped the patch file \verb|libffi-3.2.1-k1om.patch| into the
+subdirectory \verb|dev-libs/libffi-3.2.1| under
+\verb|/micfs/gentoo-mic/etc/portage/patches|. If the version is
+ommitted, the patch will apply to all versions.
 
 After everything has been properly configured as shown above, Python
 and all its dependencies can be cross compiled with a single command
