@@ -157,18 +157,50 @@ Gentoo Prefix runs on Cray with some minor site-specific modifications
 \cite{cray}.
 
 Gentoo Prefix uses ebuilds from Gentoo main repository~(Section
-\ref{sec:ebuild}) and receives cutting edge updates by 300 developers
-and contributed by thousands of users.  It is a general-purpose and
-full-featured environment, which mitigates a big portion of complexity
-and workload of HPC software maintenance. \LaTeX{} and pandoc for
-publication, emacs and vim for editing, vnc and xpra for remote
-display, to name a few, are all available.
+\ref{sec:ebuild}) and receives cutting edge updates by hundreds of
+developers and contributed by thousands of users.  It is a
+general-purpose and full-featured environment, which mitigates a big
+portion of complexity and workload of HPC software
+maintenance. \LaTeX{} and pandoc for publication, emacs and vim for
+editing, vnc and xpra for remote display, to name a few, are all
+available.
 
 From users' point of view, Gentoo Prefix vastly expands the tools
 available for HPC.  From administrators' point of view, Gentoo Prefix
 supports a diversity of user needs and at the same time keep the core
 operating system stable and secure. The following sections presents
 several case studies to show the flexibility of Gentoo Prefix.
+
+
+Installation instructions for Gentoo Prefix can be found on the project
+website \cite{gentoo:prefix}. The \texttt{bootstrap-prefix.sh} script
+automates most of the process.
+\begin{verbatim}
+(download script from project website)
+$ chmod 755 bootstrap-prefix.sh
+$ ./bootstrap-prefix.sh
+(follow the instructions)
+\end{verbatim}
+
+The bootstrap process consists roughly of three stages: installing a
+temporary version of portage, boostrapping a compiler using the host's
+toolchain, then bootstrapping a full system with the bootstrapped
+compiler. On Linux, a C library can also be part of the bootstrap
+process, in which case the kernel is the only piece shared between the
+host and the prefix environment.
+
+The script works as an interactive installer; it will ask the user for
+some information and discuss options based on the system being
+bootstrapped on. Once the script finishes running, it will create a
+\texttt{startprefix} script at the root of the bootstrapped system.
+Running that script brings the user into the prefix environment, and
+\texttt{emerge} and other tools become available to let the user install
+more packages.
+\begin{verbatim}
+$ ${EPREFIX}/startprefix
+Entering Gentoo Prefix /micfs/gentoo
+$
+\end{verbatim}
 
 \subsection{Nested Job-Scheduling with Slurm}
 \label{sec:slurm}
@@ -321,35 +353,6 @@ server; users can just ssh into it and run their programs. In our setup,
 a server with CentOS 7 and Intel tools installed was used to host the
 Gentoo Prefix installation.
 
-Installation instructions for Gentoo Prefix can be found on the project
-website \cite{gentoo:prefix}. The \texttt{bootstrap-prefix.sh} script
-automates most of the process.
-\begin{verbatim}
-(download script from project website)
-$ chmod 755 bootstrap-prefix.sh
-$ ./bootstrap-prefix.sh
-(follow the instructions)
-\end{verbatim}
-
-The bootstrap process consists roughly of three stages: installing a
-temporary version of portage, boostrapping a compiler using the host's
-toolchain, then bootstrapping a full system with the bootstrapped
-compiler. On Linux, a C library can also be part of the bootstrap
-process, in which case the kernel is the only piece shared between the
-host and the prefix environment.
-
-The script works as an interactive installer; it will ask the user for
-some information and discuss options based on the system being
-bootstrapped on. Once the script finishes running, it will create a
-\texttt{startprefix} script at the root of the bootstrapped system.
-Running that script brings the user into the prefix environment, and
-\texttt{emerge} and other tools become available to let the user install
-more packages.
-\begin{verbatim}
-$ ${EPREFIX}/startprefix
-Entering Gentoo Prefix /micfs/gentoo
-$
-\end{verbatim}
 In order to install Intel C/C++ compiler it is necessary to first place
 the license file in \verb|${EPREFIX}/opt/intel/licenses|, and add
 \verb|Intel-SDP| to \verb|ACCEPT_LICENSE| in portage's main config file
@@ -441,32 +444,72 @@ all the requirements:
 \section{A Deeper Look at Multiple Versions and Build Configurations}
 Both the HSF technical report~\cite{hsf:package} and Gamblin et
 al.~\cite{spack} argue that multiple versions and multiple build
-options of the same package should be available at the same time to
-support wide user groups in a shared HPC environment.
+configurations of the same package should be available at the same
+time to support wide user groups in a shared HPC environment.  Gamblin
+et al.~\cite{spack} also put forward explicitly that software build is
+by its nature combinatorial, therefore a package manager should
+support all the combinations natively.  Although from an administrator
+point of view the system potentially have all kind of combinations,
+for a single user or a closely collaborated group this is an overkill.
 
-Gamblin et al.~\cite{spack} argue that software build is by its nature
-combinatorial, therefore a package manager should support all the
-combinations natively.  Although from an administrator point of view
-the system should potentially all kind of combinations, for a single
-user or a closely collaborated group this is an overkill.
+If each user group maintain their own software stack, support for
+multiple versions and build configurations is rarely necessary.
+Therefore the advantage provided by multiple versions and build
+configurations is limited to administrators.
 
-If each group maintain their own packages, then support for multiple
-versions or build configurations is rarely necessary.  If the site
-administrator installs multiple versions or build configurations for
-different groups, the overhead of request-response still exists.
 
-Only few packages need it, the majority do not.  Conscious and
-educated decisions are need for each package to enable multiple
-version/build-configuration.  For packages that are decided to have
-multiple, portage provides the frameworks: including multilib,
-eselect, slot.
+Only few packages need explicit track of versions and build
+configurations, like compilers/interpreters (gcc-4 vs. 5 vs. 6,
+python-2 vs. 3, ruby-2.2 vs. 2.3), MPI implementations, blas/lapack
+implementations, autoconf/automake versions, complete rewrites of
+frameworks (Geant-3 vs. 4).  For the majority of relatively small
+tools the cost of complexity exceeds the benefit of diversity of
+multiple versions and build configurations.  Ultimately it is a
+balance between simplicity and diversity.  Portage takes the balance
+to provide straightforward solutions to multiple \emph{SLOTs} and
+alternative implementations by \emph{eseelct} easily but disable it by
+default and only enabled after conscious and educated decisions.
+Installing a multitude versions and build configurations of the same
+packages \emph{by default} is pursuing the diversity extreme.
 
-Gentoo Prefix is easy to bootstrap, and even easier to bootstrap a new
-one from an existing installation. Throught Prefix-chaining,
-initiating a new installation is even cheaper.
+Project management in scientific software is far from mature.  Authors
+of scientific packages often value instant gratification (publish of
+an article) more than long term maintainability (robust build system,
+stable API, etc.).  ABI and even API incompatibilities between minor
+updates are uncommon.  Function calls from libraries could give
+different results when linked against different stardard c++ runtime.
+It therefore becomes crucial for a package manager to support multiple
+versions and build configurations to facilitate reproducibility in
+research.  Package managers with such a feature provide an instant
+solution to the chaos of scientific software like a painkiller.
+Providing such a feature by default may encourage the bad practice.
 
-\section{Multiple Build Variants}
+There is a growing consensus that computer programs are replacing
+mathematics to become the most used language of science.  There will
+more sosophisticated science software.  The value of good practice in
+project management will be more conspicuous, most of which are already
+established in software communities.
 
+Therefore supporting multiple versions and build configurations by
+default calls for more caution.
+
+\section{Conclusion}
+\label{sec:conclusion}
+Portage is a powerful package management system from Gentoo.  It is
+robust, mature, well-documented and user-friendly.  It is especially
+suitable in HPC setups.  Gentoo Prefix is easy to bootstrap, and
+easier to bootstrap a new instance from an existing one.  It brings
+power of a well-received meta-distribution to the users, and at the
+same time reduces the heavy maintanance burden of administrators.
+
+Portage and Gentoo repositories are scrutinized by hundreds of
+developers worldwide, many of whom are software professionals and
+respected hackers.  They grow out of a group of people who engineer
+complex software.  Their wisdom to handle complexity is invaluable to
+scientific communities.
+
+Portage is a perfect bridge between hackers and scientists, and gives
+an ultimate solution to the chaotic status quo of HPC software stacks.
 \bibliographystyle{IEEEtran}
 \bibliography{portage}
 \end{document}
