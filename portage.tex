@@ -100,8 +100,8 @@ is performed by a shell script that installs the Portage package manager
 into a temporary location, then uses it to bootstrap a compiler and
 install the base system, which allows the user to compile and install
 other sofware packages available in the Portage database. Gentoo Prefix
-can be installed not only on Linux, but also on Mac OS X, BSD, AIX,
-Solaris, etc. On Mac OS X, Gentoo Prefix is similar to projects
+can be installed not only on Linux, but also on Mac~OS~X, BSD, AIX,
+Solaris, etc. On Mac~OS~X, Gentoo Prefix is similar to projects
 such as Homebrew, MacPorts (source based) and Fink (binary based).
 
 \subsection{Portage Package Manager}
@@ -116,28 +116,29 @@ interface to ebuild. The relationship between ebuild and emerge is
 similar to that of rpm and yum on Red Hat, and that of dpkg and apt on
 Debian.
 
-Portage packages are special bash shell scripts called \emph{ebuilds}
-(not to be confused with the ebuild tool itself that is used to run
-them). Ebuilds are similar to spec files in SRPMs; they contain
-information on how to download, configure, compile, and install
-software, as well as their dependency requirements. Gentoo's main ebuild
-repository has more than 27000 ebuilds available for a variety of
-architectures. Additional packages are available via official and
-unofficial package overlays that complement the main tree of packages.
-The special syntax used in ebuild scripts is standardized in the Package
-Manager Specification (PMS) \cite{gentoo:pms} document. The PMS
-documents the behavior of Portage so that Gentoo packages can be managed
-by alternative package managers, such as paludis \cite{paludis} and pkgcore \cite{pkgcore}.
+Portage packages are special bash shell scripts called
+\emph{ebuilds}~(not to be confused with the ebuild tool itself that is
+used to run them). Ebuilds are similar to spec files in SRPMs; they
+contain information on how to download, configure, compile, and
+install software, as well as their dependency requirements. Gentoo's
+main ebuild repository has more than 27000 ebuilds available for a
+variety of architectures. Additional packages are available via
+official and unofficial package overlays that complement the main tree
+of packages.  The special syntax used in ebuild scripts is
+standardized in the Package Manager Specification (PMS)
+\cite{gentoo:pms} document. The PMS documents the behavior of Portage
+so that Gentoo packages can be managed by alternative package
+managers, such as paludis \cite{paludis} and pkgcore \cite{pkgcore}.
 
-The Portage system has the concept of \emph{USE flags} to allow the user
-to configure compile-time options of software packages. USE flags affect
-which dependencies are required to build a package, which allows, for
-example, a headless server to be installed with a lighter system image,
-by stripping all options for building a graphical environment. USE flags
-can be used in HPC systems to enable or disable MPI support, to choose
-which version of the Python interpreter a module should target, to
-enable specific instruction sets for a given architecture, among many
-others.
+The Portage system has the concept of \emph{USE flags} to allow the
+user to configure compile-time options of software packages. USE flags
+affect which dependencies are required to build a package, which
+allows, for example, a headless server to be installed with a lighter
+system footprint, by stripping all options for building a graphical
+environment. USE flags can be used in HPC systems to enable or disable
+MPI support, to choose which version of the Python interpreter a
+module should target, to enable specific instruction sets for a given
+architecture, among many others.
 
 For software packages that require specific versions, Portage has the
 concept of package \emph{SLOTs} \cite[p.~27]{gentoo:pms}, which allow multiple versions of a same
@@ -158,12 +159,11 @@ Gentoo Prefix runs on Cray with some minor site-specific modifications
 
 Gentoo Prefix uses ebuilds from Gentoo's main repository~(Section
 \ref{sec:ebuild}) and receives cutting edge updates by hundreds of
-developers and contributed by thousands of users. It is a
-general-purpose and full-featured environment, which mitigates a big
-portion of the complexity and workload of HPC software
-maintenance. \LaTeX{} and pandoc for publication, emacs and vim for
-editing, vnc and xpra for remote display, to name a few, are all
-available.
+developers and thousands of user contributors. It is a general-purpose
+and full-featured environment, which mitigates a big portion of the
+complexity and workload of HPC software maintenance. \LaTeX{} and
+pandoc for publication, emacs and vim for editing, vnc and xpra for
+remote display, to name a few, are all available.
 
 From the users' point of view, Gentoo Prefix vastly expands the tools
 available for HPC. From the administrators' point of view, Gentoo
@@ -184,9 +184,15 @@ $ ./bootstrap-prefix.sh
 The bootstrap process consists roughly of three stages: installing a
 temporary version of Portage, boostrapping a compiler using the host's
 toolchain, then bootstrapping a full system with the bootstrapped
-compiler. On Linux, a C library can also be part of the bootstrap
-process, in which case the kernel is the only piece shared between the
-host and the prefix environment.
+compiler. On Linux, a C standard library can also be part of the
+bootstrap process, in which case the kernel is the only piece shared
+between the host and the prefix environment.  To have the C standard
+library from Gentoo, rename the script before invoking it.
+\begin{verbatim}
+$ mv bootstrap-prefix.sh bootstrap-rap.sh
+$ ./bootstrap-rap.sh
+(follow the instructions)
+\end{verbatim}
 
 The script works as an interactive installer; it will ask the user for
 some information and discuss options based on the system being
@@ -226,9 +232,10 @@ CPUs.
   \centering
   \includegraphics[width=0.5\textwidth]{node-slurm.eps}
   \caption{User slurm is nested in site PBS Pro. The nodes are
-    allocated by PBS and 1 slurm worker runs on 1 node.
+    allocated by PBS and each slurm worker runs on each node.
     Single-threaded jobs are controlled and queued by user slurm
-    controller. Resources within a node are individually allocated.}
+    controller. Resources within a node, such as CPUs and memory, are
+    individually allocated.}
   \label{fig:slurm}
 \end{figure}
 
@@ -236,7 +243,10 @@ Assuming that the host scheduler is PBS Professional and has been
 installed by the site administrators, a nested slurm
 scheduler~(Fig.~\ref{fig:slurm}) can be installed by a normal user with
 Gentoo Prefix on a filesystem shared between all nodes.
-\begin{verbatim} $ emerge sys-cluster/slurm \end{verbatim}
+\begin{verbatim} 
+$ emerge sys-cluster/slurm 
+\end{verbatim}
+
 After editing \texttt{EPREFIX/etc/slurm/slurm.conf} to enable individual
 allocation of resources within a node, the slurm worker can be launched by
 \texttt{slurmd} and the slurm controller by \texttt{slurmctld}.
@@ -292,8 +302,8 @@ for interpreting massif outputs besides the default CLI-based
 massif-visualizer is a KDE application. It depends on a recent KDE
 framework, which is a fairly large and complex software stack. Gentoo
 Prefix readily provides the whole KDE stack thanks to the shared
-\textit{ebuilds} with main Gentoo repository. As massif-visualizer is
-already in the KDE overlay, building it is straightforward,
+\textit{ebuilds} with the main Gentoo repository. As massif-visualizer
+is already in the KDE overlay, building it is straightforward,
 \begin{verbatim}
 $ layman --add=kde
 $ emerge kde-misc/massif-visualizer
@@ -386,8 +396,6 @@ ACCEPT_KEYWORDS="~amd64-linux"
 
 CONFIG_SHELL="/micfs/gentoo/bin/bash"
 
-FEATURES="-news"
-
 CBUILD="x86_64-pc-linux-gnu"
 CHOST="x86_64-k1om-linux-gnu"
 
@@ -459,14 +467,14 @@ when logged in on the Xeon Phi™, Portage works quite well.
 
 \section{Assessment of Portage for HPC}
 
-With more than 10 years development, Portage has become an excellent and
-mature package management system. It is general purpose and used in a
-diversity of scenarios. Nevertheless, it is still worthwhile to assess
-whether Portage meets the specific needs of the HPC community. The
-technical report from the software packaging working group of HEP software
-fundation~\cite{hsf:package} has summarized the requirements of HPC from
-the point of view of high energy physics, which is applicable to other
-fields.
+With more than 10 years development, Portage has become an excellent
+and mature package management system. It is general purpose and used
+in a diversity of scenarios. Nevertheless, it is still worthwhile to
+assess whether Portage meets the specific needs of the HPC
+community. The technical report from the software packaging working
+group of HEP software fundation~\cite{hsf:package} has summarized the
+requirements of HPC from the point of view of high energy physics,
+which is also applicable to other fields.
 
 As the core of Gentoo is a meta distribution, Portage naturally satisfies
 all the requirements:
@@ -483,11 +491,11 @@ all the requirements:
 \item Support: The Gentoo community is friendly, active and
   supportive. Documentaion of Gentoo is abundant and informative.
 \item Performance: Gentoo is a Linux distribution famous for keeping
-  users' CPU warm. Compiling thousands of packages is a daily
-  exercise of an average Gentoo user. Portage provides a mature build
-  system scrutinized by hackers all around the world and tested in
-  every extreme setups. The vcs support (checking out sources from
-  cvs, svn, git, mercury, etc.) is implemented by eclasses.
+  users' CPU warm. Compiling thousands of packages is a daily exercise
+  of an average Gentoo user. Portage provides a mature build system
+  scrutinized by hackers all around the world and tested in every
+  extreme setups. The vcs support (checking out sources from cvs, svn,
+  git, mercury, etc.) implemented by eclasses is excellent.
 \end{enumerate}
 
 \section{A Deeper Look at Multiple Versions and Build Configurations}
@@ -511,37 +519,42 @@ Only a few packages need explicit version tracking and specific build
 configurations, like compilers/interpreters (gcc-4 vs. 5 vs. 6,
 python-2 vs. 3, ruby-2.2 vs. 2.3), MPI implementations, blas/lapack
 implementations, autoconf/automake versions, complete rewrites of
-frameworks (Geant-3 vs. 4). For the majority of relatively small
-tools the cost of complexity exceeds the benefit of diversity of
-multiple versions and build configurations. Ultimately it is a
-balance between simplicity and diversity. Portage provides
-straightforward solutions for installing multiple package versions
-with \emph{SLOTs} and for selecting among alternative implementations
-with \emph{eselect}, or disabling all implementations by
-default and only enabling them after conscious and educated decisions.
-Installing a multitude of versions and build configurations of the same
-packages \emph{by default} is pursuing diversity to the extreme.
+frameworks (Geant-3 vs. 4). For the majority of relatively small tools
+the cost of complexity exceeds the benefit of diversity of multiple
+versions and build configurations. Ultimately it is a balance between
+simplicity and diversity. Portage provides straightforward solutions
+for installing multiple package versions with \emph{SLOTs} and for
+selecting among alternative implementations with \emph{eselect}, or
+disabling all implementations by default and only enabling them after
+conscious and educated decisions.  Conversely, installing a multitude
+of versions and build configurations of a single package \emph{by
+  default} is pursuing diversity to the extreme.
 
 Project management in scientific software is far from mature. Authors
 of scientific packages often value instant gratification (publish of
 an article) more than long term maintainability (robust build system,
 stable API, etc.). ABI and even API incompatibilities between minor
-updates are common. Function calls from libraries could give
-different results when linked against different stardard c++ runtime.
-It therefore becomes crucial for a package manager to support multiple
-versions and build configurations to facilitate reproducibility in
-research. Package managers with such a feature provide an instant
-solution to the chaos of scientific software like a painkiller.
-Providing such a feature by default may encourage bad practice.
+updates are common. Function calls from libraries could give different
+results when linked against different versions of stardard c++
+runtime.  It therefore becomes crucial for a package manager to
+support multiple versions and build configurations to facilitate
+reproducibility in research. Package managers with such a feature
+provide an instant solution to the chaos of scientific software like a
+painkiller.  Providing such a feature by default may encourage bad
+practice.
 
 There is a growing consensus that computer programs are replacing
-mathematics to become the most used language of science. There will more
-sosophisticated scientific software in the future. The value of good
-practice in project management will be more conspicuous, most of which
-are already established in software communities.
+mathematics to become the most used language of science. There will be
+more sophisticated scientific software in the future. The value of
+good practice in project management will be more conspicuous, most of
+which are already established in free and open source software
+communities.  In the context of HPC, it is more important to draw on
+the experience of software communities than to circumvent issues
+caused by bad designs.
 
 Therefore supporting multiple versions and build configurations by
-default calls for more caution.
+default calls for more caution, especially for a healthy scientific
+ecosystem in the a long run.
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -549,7 +562,7 @@ Portage is a powerful package management system from Gentoo. It is
 robust, mature, well-documented and user-friendly. It is especially
 suitable in HPC setups. Gentoo Prefix is easy to bootstrap, and
 easier to bootstrap a new instance from an existing one. It brings
-the power of a well-received meta-distribution to the users, and at the
+the power of a well-received metadistribution to the users, and at the
 same time reduces the heavy maintanance burden of administrators.
 
 Portage and Gentoo repositories are scrutinized by hundreds of
@@ -559,7 +572,9 @@ complex software. Their wisdom to handle complexity is invaluable to
 scientific communities.
 
 Portage is a perfect bridge between hackers and scientists, and gives
-an ultimate solution to the chaotic status quo of HPC software stacks.
+an ultimate solution to the chaotic \emph{status quo} of HPC software
+stacks.
+
 \bibliographystyle{IEEEtran}
 \bibliography{portage}
 \end{document}
